@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">Javier Pool</string>
+    <string-array name="Mesas">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+        <item>0</item>
+    </string-array>
+
+    <string-array name="Precios">
+        <item>75</item>
+        <item>80</item>
+        <item>85</item>
+        <item>90</item>
+        <item>92</item>
+        <item>97</item>
+        <item>100</item>
+        <item>110</item>
+        <item>113</item>
+        <item>120</item>
+        <item>125</item>
+        <item>130</item>
+        <item>135</item>
+    </string-array>
+
+    <string-array name="Productos">
+        <item>600</item>
+        <item>350</item>
+        <item>1000</item>
+        <item>1200</item>
+        <item>1500</item>
+        <item>2000</item>
+        <item>2500</item>
+        <item>3000</item>
+        <item>3500</item>
+        <item>4000</item>
+        <item>5000</item>
+        <item>8000</item>
+        <item>10000</item>
+    </string-array>
+</resources>
