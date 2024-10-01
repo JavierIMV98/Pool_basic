@@ -115,7 +115,7 @@
                     android:layout_weight="1"
                     android:backgroundTint="#03A974"
                     android:text="CREAR"
-                    android:textSize="16sp" />
+                    android:textSize="34sp" />
 
                 <Button
                     android:id="@+id/crearcustom"
@@ -127,7 +127,7 @@
                     android:layout_weight="1"
                     android:backgroundTint="#BF9104"
                     android:text="#HORA"
-                    android:textSize="16sp" />
+                    android:textSize="34sp" />
 
         </LinearLayout>
 

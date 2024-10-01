@@ -161,7 +161,7 @@
                     android:layout_weight="0.45"
                     android:backgroundTint="#069D6D"
                     android:text="GUARDAR"
-                    android:textSize="24sp" />
+                    android:textSize="28sp" />
 
                 <Button
                     android:id="@+id/btneliminar"
@@ -173,7 +173,7 @@
                     android:layout_weight="0.45"
                     android:backgroundTint="#E91E1E"
                     android:text="ELIMINAR"
-                    android:textSize="24sp" />
+                    android:textSize="28sp" />
             </LinearLayout>
         </LinearLayout>
 

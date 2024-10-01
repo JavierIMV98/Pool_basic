@@ -42,7 +42,7 @@
             android:text="01/07/2024 20:00:00"
             android:textAlignment="center"
             android:textColor="#FFFFFF"
-            android:textSize="24sp" />
+            android:textSize="34sp" />
 
         <TextView
             android:id="@+id/tvprecio"
@@ -55,6 +55,6 @@
             android:text="100"
             android:textAlignment="center"
             android:textColor="#FFFFFF"
-            android:textSize="16sp" />
+            android:textSize="24sp" />
     </LinearLayout>
 </LinearLayout>

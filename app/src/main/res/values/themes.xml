@@ -5,7 +5,7 @@
         <!-- Customize your light theme here. -->
 
         <!-- Asegúrate de que los íconos sean claros -->
-        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightStatusBar">true</item>
         <item name="android:windowFullscreen">false</item>
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>

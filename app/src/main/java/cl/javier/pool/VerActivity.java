@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,6 +27,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 
 import cl.javier.pool.adaptadores.ListaMesasAdapter;
 import cl.javier.pool.db.DbMesas;
@@ -54,7 +56,8 @@ public class VerActivity extends AppCompatActivity {
         });
 
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-        getWindow().setStatusBarColor(Color.rgb(27,74,59));
+        getWindow().setStatusBarColor(Color.WHITE);
+
 
         etnro = findViewById(R.id.etnro);
         ethora = findViewById(R.id.ethora);
@@ -62,6 +65,9 @@ public class VerActivity extends AppCompatActivity {
         etextra = findViewById(R.id.etextra);
         tvtotal = findViewById(R.id.tvtotal);
         btneditar = findViewById(R.id.btneditar);
+
+
+        ethora.setInputType(InputType.TYPE_CLASS_DATETIME | InputType.TYPE_DATETIME_VARIATION_TIME);
 
 
 

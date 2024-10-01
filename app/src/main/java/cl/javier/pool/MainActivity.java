@@ -57,12 +57,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-        getWindow().setStatusBarColor(Color.rgb(27,74,59));
+        getWindow().setStatusBarColor(Color.WHITE);
 
         listaMesas = findViewById(R.id.rv_lista_mesas);
         listaMesas.setLayoutManager(new LinearLayoutManager(this));
