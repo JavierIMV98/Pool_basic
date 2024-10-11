@@ -12,7 +12,7 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 
 public class DbMesas extends DbHelper {
-    Context context;
+    static Context context;
     public DbMesas(@Nullable Context context) {
         super(context);
         this.context = context;
@@ -35,7 +35,7 @@ public class DbMesas extends DbHelper {
         }
         return id;
     }
-    public ArrayList<Mesas> mostrarMesas(){
+    public static ArrayList<Mesas> mostrarMesas(){
         DbHelper dbHelper = new DbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 

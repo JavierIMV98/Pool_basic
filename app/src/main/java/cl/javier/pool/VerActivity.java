@@ -67,6 +67,7 @@ public class VerActivity extends AppCompatActivity {
         btneditar = findViewById(R.id.btneditar);
 
 
+
         ethora.setInputType(InputType.TYPE_CLASS_DATETIME | InputType.TYPE_DATETIME_VARIATION_TIME);
 
 
@@ -116,14 +117,60 @@ public class VerActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(!etnro.getText().toString().equals("") && !(ethora.getText().toString()).equals("") && !etprecio.getText().toString().equals("") && !etextra.getText().toString().equals("")){
-
+                    listaArrayMesas = DbMesas.mostrarMesas();
                     boolean correct = true;
+                    boolean existe = false;
+
+                    boolean nronocambiado = etnro.getText().toString().equals(String.valueOf(mesa.getNro()));
+
                     try {
 
                         String hora = ethora.getText().toString();
                         LocalTime hl = LocalTime.parse(hora, DateTimeFormatter.ofPattern("HH:mm"));
-                        correcto = dbMesas.editarMesa((Integer.parseInt(etnro.getText().toString())),(ethora.getText().toString()),(Integer.parseInt(etprecio.getText().toString())),(Integer.parseInt(etextra.getText().toString())));
-                        mesa = dbMesas.verMesas(Integer.parseInt(etnro.getText().toString()));
+
+                        //si no se ha cambiado el numero de la mesa:
+                        if (etnro.getText().toString().equals(String.valueOf(mesa.getNro()))){
+                            correcto = dbMesas.editarMesa((Integer.parseInt(etnro.getText().toString())),(ethora.getText().toString()),(Integer.parseInt(etprecio.getText().toString())),(Integer.parseInt(etextra.getText().toString())));
+                            mesa = dbMesas.verMesas(Integer.parseInt(etnro.getText().toString()));
+                        }
+                        //si el numero se cambió:
+                        else{
+                            for (Mesas mesaa : listaArrayMesas){
+                                int nromesalista = mesaa.getNro();
+                                if ( nromesalista != Integer.parseInt(etnro.getText().toString())){
+                                    existe = false;
+                                }
+                                else{
+                                    existe = true;
+                                    break;
+                                }
+
+                            }
+                            if (existe) {
+                                int antnro = Integer.parseInt(String.valueOf(mesa.getNro()));
+                                confirmarCambiarExiste(antnro,(Integer.parseInt(etnro.getText().toString())),(ethora.getText().toString()),(Integer.parseInt(etprecio.getText().toString())),(Integer.parseInt(etextra.getText().toString())));
+                                correcto = true;
+
+
+
+                            }else{
+                                dbMesas.insertarMesas((Integer.parseInt(etnro.getText().toString())),(ethora.getText().toString()),(Integer.parseInt(etprecio.getText().toString())),(Integer.parseInt(etextra.getText().toString())));
+                                correcto = dbMesas.eliminarMesa(Integer.parseInt(String.valueOf(mesa.getNro())));
+
+                                new Handler().postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Intent i = new Intent(VerActivity.this,MainActivity.class);
+                                        startActivity(i);
+                                    }
+                                }, 1000);
+
+                            }
+                        }
+
+
+
+
                     }catch (Exception ex){
                         correct = false;
                         String texto = ex.toString();
@@ -132,7 +179,7 @@ public class VerActivity extends AppCompatActivity {
 
 
 
-                    if (correct && correcto){
+                    if (correct && correcto && nronocambiado){
 
                         int minutos = (int) (TimeUtils.calcularDiferenciaEnMinutos(mesa.getHora_inicio()));
                         int prhora = mesa.getPrecio()*minutos;
@@ -141,11 +188,36 @@ public class VerActivity extends AppCompatActivity {
                         }else{
                             tvtotal.setText( "Minutos: (" + minutos + ") " + " + Extras : " + ( mesa.getExtras()));
                         }
-                        Snackbar.make(findViewById(android.R.id.content), "Actualizado", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(findViewById(android.R.id.content), "Actualizado...", Snackbar.LENGTH_SHORT).show();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent i = new Intent(VerActivity.this,MainActivity.class);
+                                startActivity(i);
+                            }
+                        }, 1000);
 
 
-                    }else{
+                    } else if (correct && correcto && !existe) {
+                        Snackbar.make(findViewById(android.R.id.content), "Cambiando mesa...", Snackbar.LENGTH_SHORT).show();
+
+                    }else if (correct && correcto && existe) {
+                        Snackbar.make(findViewById(android.R.id.content), "Esperando...", Snackbar.LENGTH_SHORT).show();
+
+                    }
+                    else{
                         Snackbar.make(findViewById(android.R.id.content), "Error al modificar", Snackbar.LENGTH_SHORT).show();
+                        etnro.setText(String.valueOf(mesa.getNro()));
+                        ethora.setText(mesa.getHora_inicio());
+                        etprecio.setText(String.valueOf(mesa.getPrecio()));
+                        etextra.setText(String.valueOf(mesa.getExtras()));
+                        int minutos = (int) (TimeUtils.calcularDiferenciaEnMinutos(mesa.getHora_inicio()));
+                        int prhora = mesa.getPrecio()*minutos;
+                        if (minutos >= 55){
+                            tvtotal.setText( "Minutos: (" + minutos + ") " + (prhora) + "$" + " + Extras = " + (prhora + mesa.getExtras()));
+                        }else{
+                            tvtotal.setText( "Minutos: (" + minutos + ") " + " + Extras : " + ( mesa.getExtras()));
+                        }
 
                     }
                 }else{
@@ -156,6 +228,220 @@ public class VerActivity extends AppCompatActivity {
         });
 
     }
+
+    public boolean confirmarCambiarExiste(int nant,int numero, String hra, int pre, int ext ) {
+        DbMesas dbMesas = new DbMesas(VerActivity.this);
+        final boolean[] seleccionado = {false};
+        // Crear el TextView
+        final TextView[] textView = {new TextView(this)};
+        LinearLayout container = new LinearLayout(this);
+        container.setOrientation(LinearLayout.VERTICAL);
+
+        // Configuración del TextView
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(50, 0, 50, 0); // Márgenes
+        textView[0].setLayoutParams(params);
+        textView[0].setText("¿La mesa existe, eliminar anterior?");
+        textView[0].setTextSize(24);
+        textView[0].setTextColor(Color.WHITE);
+        container.setBackgroundColor(Color.parseColor("#333333"));
+        container.addView(textView[0]);
+
+        // Crear el AlertDialog
+        AlertDialog.Builder dialogo = new AlertDialog.Builder(this);
+        dialogo.setView(container);
+
+        dialogo.setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                boolean correcto = dbMesas.eliminarMesa(numero);
+
+                long insert = dbMesas.insertarMesas(numero, hra, pre, ext);
+                boolean asd = dbMesas.eliminarMesa(nant);
+                seleccionado[0] = true;
+
+
+                if(insert > 0){
+                    Snackbar.make(findViewById(android.R.id.content), "Mesa anterior actualizada", Snackbar.LENGTH_SHORT).show();
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent i = new Intent(VerActivity.this,MainActivity.class);
+                            startActivity(i);
+                        }
+                    }, 1000);
+
+                }
+            }
+        });
+
+        dialogo.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                Snackbar.make(findViewById(android.R.id.content), "Cancelado...", Snackbar.LENGTH_SHORT).show();// Cerrar el diálogo sin hacer nada
+                seleccionado[0] = false;
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Intent i = new Intent(VerActivity.this,MainActivity.class);
+                        startActivity(i);
+                    }
+                }, 1000);
+            }
+        });
+
+        AlertDialog alertDialog = dialogo.create();
+        alertDialog.show();
+
+        // Cambiar estilo de los botones
+        Button btnSi = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button btnNo = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+        // Establecer colores
+        btnSi.setBackgroundColor(Color.parseColor("#4CAF50"));
+        btnNo.setBackgroundColor(Color.parseColor("#F44336"));
+        btnSi.setTextColor(Color.WHITE);
+        btnNo.setTextColor(Color.WHITE);
+
+        // Ajustar el tamaño del texto
+        btnSi.setTextSize(36);
+        btnNo.setTextSize(36);
+
+        // Aplicar márgenes y padding
+        LinearLayout.LayoutParams layoutParamsSi = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        LinearLayout.LayoutParams layoutParamsNo = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+
+        // Establecer márgenes
+        int margin = 10;
+        layoutParamsSi.setMargins(margin, 0, margin, 0);
+        layoutParamsNo.setMargins(margin, 0, margin, 0);
+
+        // Aplicar layoutParams a los botones
+        btnSi.setLayoutParams(layoutParamsSi);
+        btnNo.setLayoutParams(layoutParamsNo);
+
+        // Establecer padding
+        int padding = 36;
+        btnSi.setPadding(padding + 100, padding, padding + 100, padding);
+        btnNo.setPadding(padding + 75, padding, padding +75, padding);
+        return seleccionado[0];
+    }
+
+
+
+
+    public void confirmarCambiarNoExiste(int nant,int numero, String hra, int pre, int ext ) {
+        DbMesas dbMesas = new DbMesas(VerActivity.this);
+        // Crear el TextView
+        TextView textView = new TextView(this);
+        LinearLayout container = new LinearLayout(this);
+        container.setOrientation(LinearLayout.VERTICAL);
+
+        // Configuración del TextView
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(50, 0, 50, 0); // Márgenes
+        textView.setLayoutParams(params);
+        textView.setText("¿La mesa no existe, crear?");
+        textView.setTextSize(24);
+        textView.setTextColor(Color.WHITE);
+        container.setBackgroundColor(Color.parseColor("#333333"));
+        container.addView(textView);
+
+        // Crear el AlertDialog
+        AlertDialog.Builder dialogo = new AlertDialog.Builder(this);
+        dialogo.setView(container);
+
+        dialogo.setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                long insert = dbMesas.insertarMesas(numero, hra, pre, ext);
+
+                if (insert != 0){
+                    boolean correcto = dbMesas.eliminarMesa(nant);
+                }
+
+
+
+                if(insert > 0){
+                    Snackbar.make(findViewById(android.R.id.content), "Mesa Creada y cambiada", Snackbar.LENGTH_SHORT).show();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            Intent i = new Intent(VerActivity.this,MainActivity.class);
+                            startActivity(i);
+                        }
+                    }, 1000);
+
+                }
+            }
+        });
+
+        dialogo.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                Snackbar.make(findViewById(android.R.id.content), "Cancelado", Snackbar.LENGTH_SHORT).show();// Cerrar el diálogo sin hacer nada
+            }
+        });
+
+        AlertDialog alertDialog = dialogo.create();
+        alertDialog.show();
+
+        // Cambiar estilo de los botones
+        Button btnSi = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button btnNo = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+        // Establecer colores
+        btnSi.setBackgroundColor(Color.parseColor("#4CAF50"));
+        btnNo.setBackgroundColor(Color.parseColor("#F44336"));
+        btnSi.setTextColor(Color.WHITE);
+        btnNo.setTextColor(Color.WHITE);
+
+        // Ajustar el tamaño del texto
+        btnSi.setTextSize(36);
+        btnNo.setTextSize(36);
+
+        // Aplicar márgenes y padding
+        LinearLayout.LayoutParams layoutParamsSi = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        LinearLayout.LayoutParams layoutParamsNo = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+
+        // Establecer márgenes
+        int margin = 10;
+        layoutParamsSi.setMargins(margin, 0, margin, 0);
+        layoutParamsNo.setMargins(margin, 0, margin, 0);
+
+        // Aplicar layoutParams a los botones
+        btnSi.setLayoutParams(layoutParamsSi);
+        btnNo.setLayoutParams(layoutParamsNo);
+
+        // Establecer padding
+        int padding = 36;
+        btnSi.setPadding(padding + 100, padding, padding + 100, padding);
+        btnNo.setPadding(padding + 75, padding, padding +75, padding);
+    }
+
+
+
 
     public void confirmarEliminar() {
         DbMesas dbMesas = new DbMesas(VerActivity.this);
