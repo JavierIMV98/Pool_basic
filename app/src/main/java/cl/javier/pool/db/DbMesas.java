@@ -124,4 +124,26 @@ public class DbMesas extends DbHelper {
         }return correcto;
     }
 
+
+    public static ArrayList<Integer> obtenerMesasOcupadas() {
+        DbHelper dbHelper = new DbHelper(context);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        ArrayList<Integer> mesasOcupadas = new ArrayList<>();
+        Cursor cursorMesas = null;
+
+        // Consulta para obtener solo los números de las mesas ocupadas
+        cursorMesas = db.rawQuery("SELECT nro FROM " + TABLE_MESAS + " WHERE hora_inicio IS NOT NULL", null);
+
+        if (cursorMesas.moveToFirst()) {
+            do {
+                int numeroMesa = cursorMesas.getInt(0); // Obtener el número de la mesa
+                mesasOcupadas.add(numeroMesa);
+            } while (cursorMesas.moveToNext());
+        }
+        cursorMesas.close();
+        return mesasOcupadas;
+    }
+
+
 }

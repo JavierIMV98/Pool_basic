@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -33,6 +34,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import cl.javier.pool.adaptadores.ListaMesasAdapter;
@@ -92,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         spmesa = findViewById(R.id.spmesas);
         spprecio = findViewById(R.id.spPrecios);
 
-
+        actualizarSpinnerMesas();
 
         btnCr.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,7 +146,8 @@ public class MainActivity extends AppCompatActivity {
 
 
                 hora = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
-                numero = Math.toIntExact(spmesa.getSelectedItemId() + 1);
+                numero = Integer.parseInt(spmesa.getSelectedItem().toString());
+
                 DbMesas dbMesas = new DbMesas(MainActivity.this);
 
                 long id = dbMesas.insertarMesas(numero, hora, precio,extra);
@@ -156,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
                 listaArrayMesas = new ArrayList<>();
 
                 listaArrayMesas = dbMesas.mostrarMesas();
+                actualizarSpinnerMesas();
                 if (listaArrayMesas != null && !listaArrayMesas.isEmpty()) {
                     ListaMesasAdapter adapter = new ListaMesasAdapter(listaArrayMesas);
                     listaMesas.setAdapter(adapter);
@@ -204,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         extra = 0;
-                        numero = Math.toIntExact(spmesa.getSelectedItemId() + 1);
+                        numero = Integer.parseInt(spmesa.getSelectedItem().toString());
                         DbMesas dbMesas = new DbMesas(MainActivity.this);
 
                         if (correcto){
@@ -215,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
                             } else {
                                 Snackbar.make(findViewById(android.R.id.content), "ERROR REGISTRO", Snackbar.LENGTH_SHORT).show();
                             }
-
+                            actualizarSpinnerMesas();
                             listaArrayMesas = new ArrayList<>();
                             listaArrayMesas = dbMesas.mostrarMesas();
                             if (listaArrayMesas != null && !listaArrayMesas.isEmpty()) {
@@ -236,6 +240,28 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+    private void actualizarSpinnerMesas() {
+        DbMesas dbMesas = new DbMesas(MainActivity.this);
+        List<Integer> mesasOcupadas = dbMesas.obtenerMesasOcupadas(); // Obtener números de mesas ocupadas
+
+        List<Integer> mesasDisponibles = new ArrayList<>();
+        for (int i = 1; i <= 12; i++) {
+            if (!mesasOcupadas.contains(i)) {
+                mesasDisponibles.add(i);
+            }
+        }
+
+
+        // Ordenar la lista (en caso de que no esté en orden)
+        Collections.sort(mesasDisponibles);
+        mesasDisponibles.add(0);
+
+        // Crear el adaptador y asignarlo al Spinner
+        ArrayAdapter<Integer> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, mesasDisponibles);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spmesa.setAdapter(adapter);
+    }
+
     public void mostrarDialogoTexto(OnTextEnteredListener listener) {
 
         EditText editText = new EditText(this);
@@ -315,6 +341,7 @@ public class MainActivity extends AppCompatActivity {
         listaArrayMesas = new ArrayList<>();
 
         listaArrayMesas = dbMesas.mostrarMesas();
+        actualizarSpinnerMesas();
         if (listaArrayMesas != null && !listaArrayMesas.isEmpty()) {
             ListaMesasAdapter adapter = new ListaMesasAdapter(listaArrayMesas);
             listaMesas.setAdapter(adapter);
