@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -483,9 +485,10 @@ public class VerActivity extends AppCompatActivity {
                 DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
                 String horaFormateada = horaActual.format(formatoHora);
 
+
                 if(correcto){
                     Snackbar.make(findViewById(android.R.id.content), "Eliminado", Snackbar.LENGTH_SHORT).show();
-                    dbHistorialMesa.insertarMesasHistorial(mesa.getNro(),mesa.getHora_inicio(),horaFormateada,mesa.getPrecio(),prhora);
+                    dbHistorialMesa.insertarMesasHistorial(mesa.getNro(),mesa.getHora_inicio(),horaFormateada,mesa.getPrecio(),prhora, obtenerFechaActual());
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -585,6 +588,10 @@ public class VerActivity extends AppCompatActivity {
 
             return minutos;
         }
+    }
+    public String obtenerFechaActual() {
+        SimpleDateFormat formatoFecha = new SimpleDateFormat("dd/MM/yyyy");
+        return formatoFecha.format(new Date());
     }
 
 }
