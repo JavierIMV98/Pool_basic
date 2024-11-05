@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import cl.javier.pool.adaptadores.ListaMesasAdapter;
+import cl.javier.pool.db.DbHistorialMesa;
 import cl.javier.pool.db.DbMesas;
 import cl.javier.pool.entidades.Mesas;
 
@@ -43,6 +44,7 @@ public class VerActivity extends AppCompatActivity {
     Mesas mesa;
     int nro = 0;
     boolean correcto = false;
+    private int prhora;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,13 +98,16 @@ public class VerActivity extends AppCompatActivity {
         DbMesas dbMesas = new DbMesas(VerActivity.this);
         mesa = dbMesas.verMesas(nro);
 
+        //todo nuevo:
+        DbHistorialMesa dbHistorialMesa = new DbHistorialMesa(VerActivity.this);
+
         if (mesa != null){
             etnro.setText(String.valueOf(mesa.getNro()));
             ethora.setText(mesa.getHora_inicio());
             etprecio.setText(String.valueOf(mesa.getPrecio()));
             etextra.setText(String.valueOf(mesa.getExtras()));
             int minutos = (int) (TimeUtils.calcularDiferenciaEnMinutos(mesa.getHora_inicio()));
-            int prhora = mesa.getPrecio()*minutos;
+            prhora = mesa.getPrecio()*minutos;
             if (minutos >= 55){
                 tvtotal.setText( "Minutos: (" + minutos + ") " + (prhora) + "$" + " + Extras = " + (prhora + mesa.getExtras()));
             }else{
@@ -182,7 +187,7 @@ public class VerActivity extends AppCompatActivity {
                     if (correct && correcto && nronocambiado){
 
                         int minutos = (int) (TimeUtils.calcularDiferenciaEnMinutos(mesa.getHora_inicio()));
-                        int prhora = mesa.getPrecio()*minutos;
+                        prhora = mesa.getPrecio()*minutos;
                         if (minutos >= 55){
                             tvtotal.setText( "Minutos: (" + minutos + ") " + (prhora) + "$" + " + Extras = " + (prhora + mesa.getExtras()));
                         }else{
@@ -212,7 +217,7 @@ public class VerActivity extends AppCompatActivity {
                         etprecio.setText(String.valueOf(mesa.getPrecio()));
                         etextra.setText(String.valueOf(mesa.getExtras()));
                         int minutos = (int) (TimeUtils.calcularDiferenciaEnMinutos(mesa.getHora_inicio()));
-                        int prhora = mesa.getPrecio()*minutos;
+                        prhora = mesa.getPrecio()*minutos;
                         if (minutos >= 55){
                             tvtotal.setText( "Minutos: (" + minutos + ") " + (prhora) + "$" + " + Extras = " + (prhora + mesa.getExtras()));
                         }else{
@@ -444,6 +449,7 @@ public class VerActivity extends AppCompatActivity {
 
 
     public void confirmarEliminar() {
+        DbHistorialMesa dbHistorialMesa = new DbHistorialMesa(VerActivity.this);
         DbMesas dbMesas = new DbMesas(VerActivity.this);
         // Crear el TextView
         TextView textView = new TextView(this);
@@ -470,10 +476,16 @@ public class VerActivity extends AppCompatActivity {
         dialogo.setPositiveButton("Sí", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                Mesas mesa = dbMesas.verMesas(nro);
                 boolean correcto = dbMesas.eliminarMesa(nro);
+
+                LocalTime horaActual = LocalTime.now();
+                DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
+                String horaFormateada = horaActual.format(formatoHora);
 
                 if(correcto){
                     Snackbar.make(findViewById(android.R.id.content), "Eliminado", Snackbar.LENGTH_SHORT).show();
+                    dbHistorialMesa.insertarMesasHistorial(mesa.getNro(),mesa.getHora_inicio(),horaFormateada,mesa.getPrecio(),prhora);
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {

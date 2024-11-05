@@ -1,6 +1,7 @@
 package cl.javier.pool;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Build;
@@ -45,7 +46,7 @@ import cl.javier.pool.entidades.Mesas;
 public class MainActivity extends AppCompatActivity {
     private DbHelper dbase;
     private Button btnCr;
-    private Button btnPer;
+    private Button btnPer,btnverhist;
     private Spinner spmesa;
     private Spinner spprecio;
     private Integer numero;
@@ -93,6 +94,15 @@ public class MainActivity extends AppCompatActivity {
         btnPer= findViewById(R.id.crearcustom);
         spmesa = findViewById(R.id.spmesas);
         spprecio = findViewById(R.id.spPrecios);
+        btnverhist = findViewById(R.id.btnverHistorial);
+
+        btnverhist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivity.this, HistorialActivity.class);
+                startActivity(i);
+             }
+            });
 
         actualizarSpinnerMesas();
 
